@@ -3,12 +3,7 @@ import zipfile
 
 import pickle
 from pathlib import Path
-from tqdm import tqdm
 import json
-
-def load_json(file_path):
-    with open(file_path, 'r', encoding='utf-8') as file:
-        return json.load(file)
 
 def encode_images_from_zip(zip_path, source_dir, target_dir, path):
     Path(target_dir).mkdir(parents=True, exist_ok=True)
@@ -42,12 +37,14 @@ def process_zip_file(uttid, folder_path, target_dir, meta_dir):
         print(f"Error processing {zip_file}: {e}")
 
 def process_all_zips(folder_path, target_dir, meta_dir):
-    data = load_json(meta_dir)
-    for uttid in tqdm(data.items(), total=len(data)):
-        process_zip_file(uttid, folder_path, target_dir, meta_dir)
+    with open(meta_dir, 'r', encoding='utf-8') as csvfile:
+        csv_reader = csv.reader(csvfile)
+        for row in csv_reader: 
+            _, uttid = row
+            process_zip_file(uttid, folder_path, target_dir, meta_dir)
 
-source_dir = "../data/MOV20_zip/lip_imgs_96"
-target_dir = "../data/MOV20/lip_imgs_96"
-meta_dir = "../data/MOV20/mov20_all_data.csv"
+source_dir = "../data/MOV20_zip/lip_imgs_96/val"
+target_dir = "../data/MOV20/lip_imgs_96/val"
+meta_dir = "../data/MOV20/manifest/mov20_id_val.csv"
 
 process_all_zips(source_dir, target_dir, meta_dir)

@@ -42,7 +42,7 @@ def process_all_zips(folder_path, target_dir,meta_dir):
                 print(f"Error processing {zip_file}: {e}")
 
 
-source_dir = '../data/CAS-VSR-S101_zip/lip_imgs_112'
-target_dir = '../data/CAS-VSR-S101/lip_imgs_112'
+source_dir = "../data/CAS-VSR-S101_zip/train/lip_imgs_112"
+target_dir = "../data/CAS-VSR-S101/train/lip_imgs_112"
 meta_dir = "../data/CAS-VSR-S101/train/longform_transcripts.csv"
 process_all_zips(source_dir, target_dir,meta_dir)
