@@ -1,0 +1,141 @@
+config_name: vsr_decoding_conformer
+train_tag: vsr
+dset_type: TV101
+
+constants:
+  special_ids:
+    blank: 2
+    eos: 1
+    ignore: -1
+    sos: 0
+  vocab: 4045
+
+dataloader_init_fn: mov20_init_dataloder
+dataset_cfg:
+  aug_args:
+    drop_frm: 0.0
+    p: 0.0
+    temporal_masking: false
+  base_frms: 1000000
+  batch_size: 8
+  collator_args:
+    special_ids: ${constants.special_ids}
+  collator_cls: Seq2SeqCollatorTest
+  dset_dir: ../data/MOV20/lip_imgs_96
+  max_len: 1000
+  phase: val
+  tokenizer_args:
+    allow_oov: true
+    src_path: ./data_meta/tv101/mapping_tokenizer.txt
+  tokenizer_cls: MappingTokenizer
+  trans_dir: ../data/MOV20/manifest/mov20_id_val.csv
+
+decode_cfg:
+  beam_size: 50
+  blank: ${constants.special_ids.blank}
+  ctc_beta: null
+  eos: ${constants.special_ids.eos}
+  lb_beta: null
+  max_decode_len: 200
+  sos: ${constants.special_ids.sos}
+
+model_cfg:
+  decoder_args:
+    args:
+      block_type: UniDecoderBlock
+      dec_dim: 512
+      dff: 2048
+      dropout_attn: 0.1
+      dropout_emb: 0.3
+      dropout_posffn: 0.3
+      num_heads: 4
+      num_layers: 6
+      prenorm: false
+      tgt_len: 2000
+      tgt_vocab_size: ${constants.vocab}
+    name: UniDecoder
+  decoder_type: Transformer
+  encoder_args:
+    args:
+      block_type: ConformerEncoderBlock
+      dropout_attn: 0.1
+      dropout_conv: 0.3
+      dropout_posffn: 0.3
+      enc_dim: 512
+      ff_e: 4
+      kernel_size: 31
+      num_heads: 4
+      num_layers: 12
+      prenorm: true
+      tgt_len: 2000
+    name: ConformerEncoder
+  encoder_type: Conformer
+  frontend_args:
+    block_type: BasicBlock
+    resnet_type: ResNet18
+  frontend_type: Conv3dResNet
+  model_args:
+    dec_in_dim: 512
+    dec_out_dim: 512
+    enc_in_dim: 512
+    enc_out_dim: 512
+    frontend_dim: 512
+    vocab: ${constants.vocab}
+  model_type: TMDecoding
+
+train_cfg:
+  ckpt_dir: ./.checkpoints
+  ckpt_ph: null
+  dataset_cfg:
+    aug_args:
+      drop_frm: 0.1
+      p: 0.5
+      temporal_masking: false
+    base_frms: 3600
+    batch_size: 128
+    collator_args:
+      special_ids: ${constants.special_ids}
+    collator_cls: Seq2SeqCollator
+    dset_dir: ../data/CAS-VSR-S101/lip_imgs_112
+    max_len: 1000
+    phase: train
+    tokenizer_args:
+      allow_oov: true
+      src_path: ./data_meta/tv101/mapping_tokenizer.txt
+    tokenizer_cls: MappingTokenizer
+    trans_dir: ../data/CAS-VSR-S101/labels
+  dynamic_load: true
+  log_every: 50
+  loss_cfg:
+    ce_loss:
+      lsr_args:
+        normalize_length: true
+        padding_idx: -1
+        size: ${constants.vocab}
+        smoothing: 0.1
+      weight: 0.9
+    ctc_loss:
+      ctc_args:
+        blank: ${constants.special_ids.blank}
+        enabled: true
+        reduction: mean
+        zero_infinity: true
+      weight: 0.1
+  max_epoch: 100
+  opt_cfg:
+    layer_wise_lr_decay_eta: null
+    layer_wise_lr_decay_layers: null
+    lr: 0.0001
+    lr_mode: single
+    max_epoch: ${train_cfg.max_epoch}
+    multiple_lrs: null
+    steps_per_epoch: -1
+    warmup_epoch: null
+    warmup_iter: 10000
+    warmup_mode: iter
+    warmup_ratio: null
+  optimizer_name: AdamW
+  random_seed: 0
+  save_every: 1
+  scheduler_name: reciprocal
+

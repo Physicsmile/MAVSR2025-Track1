@@ -1,0 +1,6 @@
+editdistance==0.8.1
+numpy==1.26.4
+opencv-python==4.10.0.82
+PyTurboJPEG==1.7.3
+tensorboardX==2.6.2.2
+termcolor==2.4.0
