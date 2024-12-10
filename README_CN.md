@@ -23,7 +23,7 @@ pip install -r requirements.txt
 
 进入`data_preparation`进行数据处理和准备：
 
-下载CAS-VSR-S101放在data/CAS-VSR-S101_zip/lip_imgs_96，进行处理：
+下载CAS-VSR-S101放在data/CAS-VSR-S101_zip/lip_imgs_112，进行处理：
 
 ```Shell
 python zip2pkl_101.py
